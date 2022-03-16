@@ -4,6 +4,7 @@ const cors = require('cors');
 const multer = require('multer');
 
 var DB = require('./database/database')
+var projects = require('./projects/projects')
 
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -35,8 +36,11 @@ DB.InitialCommentsQuery(() => {
     console.log("Made initial comments table")
 })
 
-
 app.use('/images', express.static(__dirname + 'api/assets/images'));
+
+// Project Endpoints
+
+app.get('/projects/all', projects.GetAll)
 
 app.listen(process.env.SERVER_PORT, () => {
     console.log(`Server is running on port : ${process.env.SERVER_PORT}`)

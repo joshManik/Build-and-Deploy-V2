@@ -81,3 +81,15 @@ exports.InitialCommentsQuery = function(callback){
         })
     })
 }
+
+exports.GetAllFromDB = function(DB_NAME, callback){
+    var sql = `SELECT * FROM ${DB_NAME}`
+    pool.getConnection(function(err, connection){
+        if(err){ console.log(err); callback(true); return; }
+        connection.query(sql, function(err, result){
+            connection.release()
+            if(err) { console.log(err); callback(true); return; }
+            callback(false, result)
+        })
+    })
+}
