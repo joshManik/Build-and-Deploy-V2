@@ -1,0 +1,46 @@
+version: '3.8'
+services:
+
+  db:
+    container_name: DB
+    image: mysql
+    cap_add:
+      - SYS_NICE
+    restart: always
+    environment:
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+    ports:
+      - '3306'
+    network_mode: bridge
+
+  api:
+    container_name: API
+    
+    build:
+      context: .
+      dockerfile: ./api/dockerfile
+
+    depends_on:
+      - db
+    restart: always
+    ports:
+      - '4000:4000'
+    env_file:
+      - ./.env
+    network_mode: bridge
+
+  react:
+    container_name: REACT
+    
+    build:
+      context: .
+      dockerfile: ./react/dockerfile
+
+    depends_on:
+      - db
+      - api
+    restart: always
+    ports:
+      - '80:80'
+    network_mode: bridge
