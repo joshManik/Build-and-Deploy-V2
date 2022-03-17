@@ -1,7 +1,7 @@
 const express = require('express');
-const mysql = require('mysql2');
 const cors = require('cors');
 const multer = require('multer');
+const path = require('path')
 
 var DB = require('./database/database')
 var projects = require('./projects/projects')
@@ -9,7 +9,7 @@ var blog = require('./blog/blog')
 
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
-      cb(null, './assets/images')
+      cb(null, './images')
     },
     filename: function (req, file, cb) {
       cb(null, file.originalname)
@@ -22,6 +22,7 @@ const app = express();
 
 app.use(express.json());
 app.use(cors({ credentials: true }))
+app.use('/images', express.static(__dirname + '/images'));
 
 require('dotenv').config();
 
@@ -38,8 +39,6 @@ DB.InitialCommentsQuery(() => {
 })
 
 // Image upload endpoints
-
-app.use('/images', express.static(__dirname + 'api/assets/images'));
 
 app.post('/image/upload', upload.single('image', 1),(req, res) => {
     console.log(`Recieved ${req.file.filename} it is uploaded to the backend server`)
