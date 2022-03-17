@@ -37,7 +37,14 @@ DB.InitialCommentsQuery(() => {
     console.log("Made initial comments table")
 })
 
+// Image upload endpoints
+
 app.use('/images', express.static(__dirname + 'api/assets/images'));
+
+app.post('/image/upload', upload.single('image', 1),(req, res) => {
+    console.log(`Recieved ${req.file.filename} it is uploaded to the backend server`)
+    res.send(req.file.path)
+})
 
 // Project Endpoints
 
@@ -54,6 +61,8 @@ app.delete('/projects/:id', projects.DeleteSpecific)
 // Blog Endpoints
 
 app.get('/blog/all', blog.GetAll)
+
+app.post('/blog/create', blog.Create)
 
 app.listen(process.env.SERVER_PORT, () => {
     console.log(`Server is running on port : ${process.env.SERVER_PORT}`)
