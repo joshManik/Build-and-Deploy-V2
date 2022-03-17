@@ -21,6 +21,22 @@ exports.GetSpecific = function(req, res) {
     })
 }
 
+exports.UpdateSpecific = function(req, res){
+    helper.BlogMiddleware(req).then(INPUT => {
+        DB.UpdateFromID(BLOG_DB_TABLE, req.params.id, INPUT, function(err, result){
+            if(err) { console.log(err); res.send(500, "Server Error"); return; }
+            res.send(result)
+        })
+    })
+}
+
+exports.DeleteSpecific = function(req, res){
+    DB.DeleteFromID(BLOG_DB_TABLE, req.params.id, function(err, result){
+        if(err) { console.log(err); res.send(500, "Server Error"); return; }
+        res.send(result)
+    })
+}
+
 exports.Create = function(req, res){
     helper.BlogMiddleware(req).then(INPUT => {
         DB.InsertIntoDB(BLOG_DB_TABLE, INPUT, function(err, result){
