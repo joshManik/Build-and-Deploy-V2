@@ -48,8 +48,3 @@ exports.Create = function(req, res){
         })
     })
 }
-
-DB.UpdateFromID(PASTPROJECT_DB_TABLE, req.params.id, INPUT, function(err, result){
-    if(err) { console.log(err); res.send(500, "Server Error"); return; }
-    res.send(result)
-})
