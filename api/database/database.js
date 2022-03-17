@@ -129,3 +129,16 @@ exports.UpdateFromID = function(DB_NAME, ID, INPUT, callback){
         })
     })
 }
+
+exports.DeleteFromID = function(DB_NAME, ID, callback){
+    var sql = `DELETE FROM ${DB_NAME} WHERE id = ${ID}`
+    pool.getConnection(function(err, connection){
+        if(err){ console.log(err); callback(true); return; }
+        connection.query(sql, function(err, result){
+            connection.release()
+            if(err) { console.log(err); callback(true); return; }
+            callback(false, result)
+        })
+    })
+
+}

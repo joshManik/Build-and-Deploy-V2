@@ -31,6 +31,13 @@ exports.UpdateSpecific = function(req, res){
     })
 }
 
+exports.DeleteSpecific = function(req, res){
+    DB.DeleteFromID(PASTPROJECT_DB_TABLE, req.params.id, function(err, result){
+        if(err) { console.log(err); res.send(500, "Server Error"); return; }
+        res.send(result)
+    })
+}
+
 exports.Create = function(req, res){
     helper.ProjectsMiddleware(req).then(INPUT => {
         DB.InsertIntoDB(PASTPROJECT_DB_TABLE, INPUT, function(err, result){
