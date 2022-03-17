@@ -93,3 +93,39 @@ exports.GetAllFromDB = function(DB_NAME, callback){
         })
     })
 }
+
+exports.InsertIntoDB = function(DB_NAME, INPUT, callback){
+    var sql = `INSERT INTO ${DB_NAME} SET ?`
+    pool.getConnection(function(err, connection){
+        if(err){ console.log(err); callback(true); return; }
+        connection.query(sql, INPUT, function(err, result){
+            connection.release()
+            if(err){ console.log(err); callback(true); return; }
+            callback(false, result)
+        })
+    })
+}
+
+exports.SelectFromID = function(DB_NAME, ID, callback){
+    var sql = `SELECT * FROM ${DB_NAME} WHERE id = ${ID}`
+    pool.getConnection(function(err, connection){
+        if(err){ console.log(err); callback(true); return; }
+        connection.query(sql, function(err, result){
+            connection.release()
+            if(err) { console.log(err); callback(true); return; }
+            callback(false, result)
+        })
+    })
+}
+
+exports.UpdateFromID = function(DB_NAME, ID, INPUT, callback){
+    var sql = `UPDATE ${DB_NAME} SET ? WHERE id = ${ID}`
+    pool.getConnection(function(err, connection){
+        if(err){ console.log(err); callback(true); return; }
+        connection.query(sql, INPUT, function(err, result){
+            connection.release()
+            if(err){ console.log(err); callback(true); return; }
+            callback(false, result)
+        })
+    })
+}

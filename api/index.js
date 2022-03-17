@@ -42,6 +42,12 @@ app.use('/images', express.static(__dirname + 'api/assets/images'));
 
 app.get('/projects/all', projects.GetAll)
 
+app.post('/projects/create', upload.array('images', 3), projects.Create)
+
+app.get('/projects/:id', projects.GetSpecific)
+
+app.put('/projects/:id', projects.UpdateSpecific)
+
 app.listen(process.env.SERVER_PORT, () => {
     console.log(`Server is running on port : ${process.env.SERVER_PORT}`)
 });
