@@ -5,6 +5,7 @@ const multer = require('multer');
 
 var DB = require('./database/database')
 var projects = require('./projects/projects')
+var blog = require('./blog/blog')
 
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -47,6 +48,12 @@ app.post('/projects/create', upload.array('images', 3), projects.Create)
 app.get('/projects/:id', projects.GetSpecific)
 
 app.put('/projects/:id', projects.UpdateSpecific)
+
+app.delete('/projects/:id', projects.DeleteSpecific)
+
+// Blog Endpoints
+
+app.get('/blog/all', blog.GetAll)
 
 app.listen(process.env.SERVER_PORT, () => {
     console.log(`Server is running on port : ${process.env.SERVER_PORT}`)
