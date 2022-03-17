@@ -38,7 +38,7 @@ DB.InitialCommentsQuery(() => {
     console.log("Made initial comments table")
 })
 
-// Image upload endpoints
+// Image upload endpoint
 
 app.post('/image/upload', upload.single('image', 1),(req, res) => {
     console.log(`Recieved ${req.file.filename} it is uploaded to the backend server`)
@@ -53,7 +53,7 @@ app.post('/projects/create', upload.array('images', 3), projects.Create)
 
 app.get('/projects/:id', projects.GetSpecific)
 
-app.put('/projects/:id', projects.UpdateSpecific)
+app.put('/projects/:id', upload.array('images', 3), projects.UpdateSpecific)
 
 app.delete('/projects/:id', projects.DeleteSpecific)
 

@@ -23,6 +23,7 @@ exports.GetSpecific = function(req, res){
 }
 
 exports.UpdateSpecific = function(req, res){
+    console.log(req.body)
     helper.ProjectsMiddleware(req).then(INPUT => {
         DB.UpdateFromID(PASTPROJECT_DB_TABLE, req.params.id, INPUT, function(err, result){
             if(err) { console.log(err); res.send(500, "Server Error"); return; }

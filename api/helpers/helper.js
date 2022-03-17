@@ -5,11 +5,22 @@ exports.BlogMiddleware = function(req){
         if (req.body.post === undefined){
             reject(false)
         } else {
-            var INPUT = {
-                title : req.body.title, 
-                post : req.body.post,
-                author : "Josh Manik",
-                ID : 0
+
+
+            if (req.params.id === undefined){
+                var INPUT = {
+                    title : req.body.title, 
+                    post : req.body.post,
+                    author : "Josh Manik",
+                    ID : 0
+                }
+            } else {
+                var INPUT = {
+                    title : req.body.title, 
+                    post : req.body.post,
+                    author : "Josh Manik",
+                    ID : req.params.id
+                }
             }
             resolve(INPUT)
         }
@@ -19,6 +30,7 @@ exports.BlogMiddleware = function(req){
 exports.ProjectsMiddleware = function(req){
 
     return new Promise((resolve, reject) =>{
+        console.log(req.body)
         var fileCount = req.body.fileCount
         if (fileCount === undefined){
             console.log("filecount undefined")
