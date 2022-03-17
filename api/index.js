@@ -63,11 +63,11 @@ app.get('/blog/all', blog.GetAll)
 
 app.post('/blog/create', blog.Create)
 
-app.get('blog/:id', blog.GetSpecific)
+app.get('/blog/:id', blog.GetSpecific)
 
-app.put('blog/:id', blog.UpdateSpecific)
+app.put('/blog/:id', blog.UpdateSpecific)
 
-app.delete('blog/:id', blog.DeleteSpecific)
+app.delete('/blog/:id', blog.DeleteSpecific)
 
 app.listen(process.env.SERVER_PORT, () => {
     console.log(`Server is running on port : ${process.env.SERVER_PORT}`)
