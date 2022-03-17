@@ -1,5 +1,21 @@
 'use strict'
 
+exports.BlogMiddleware = function(req){
+    return new Promise((resolve, reject) => {
+        if (req.body.post === undefined){
+            reject(false)
+        } else {
+            var INPUT = {
+                title : req.body.title, 
+                post : req.body.post,
+                author : "Josh Manik",
+                ID : 0
+            }
+            resolve(INPUT)
+        }
+    })
+}
+
 exports.ProjectsMiddleware = function(req){
 
     return new Promise((resolve, reject) =>{
