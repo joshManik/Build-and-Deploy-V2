@@ -5,6 +5,7 @@ require('dotenv').config();
 const PASTPROJECT_DB_TABLE = process.env.PASTPROJECT_DB_TABLE_NAME
 const BLOG_DB_TABLE = process.env.BLOG_DB_TABLE_NAME
 const COMMENTS_DB_TABLE = process.env.COMMENTS_DB_TABLE_NAME
+const USERS_DB_TABLE = process.env.USERS_DB_TABLE_NAME
 
 var pool = mysql.createPool({
     host : process.env.DB_HOST,
@@ -49,6 +50,23 @@ exports.InitialBlogPostsQuery = function(callback){
         post TEXT NOT NULL,
         author VARCHAR(255) NOT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )`
+
+    pool.getConnection(function(err, connection){
+        if(err) { console.log(err); callback(true); return; }
+        connection.query(sql, function(err, result){
+            connection.release()
+            if(err) { console.log(err); callback(true); return; }
+            callback(false, result);
+        })
+    })
+}
+
+exports.InitialUsersQuery = function(callback){
+    var sql = `CREATE TABLE IF NOT EXISTS ${USERS_DB_TABLE} (
+        id INT PRIMARY KEY UNIQUE AUTO_INCREMENT,
+        user VARCHAR(60) NOT NULL,
+        password VARCHAR(255) NOT NULL
     )`
 
     pool.getConnection(function(err, connection){
@@ -141,4 +159,17 @@ exports.DeleteFromID = function(DB_NAME, ID, callback){
         })
     })
 
+}
+
+exports.CheckForEmail = function(DB_NAME, user, callback){
+    var sql = `SELECT * FROM ${DB_NAME} WHERE user = "${user}"`
+    pool.getConnection(function(err, connection){
+        if(err){ console.log(err); callback(true); return; }
+        connection.query(sql, function(err, result){
+            connection.release()
+            if(err) { console.log(err); callback(true); return; }
+            console.log(result)
+            callback(false, result)
+        })
+    })
 }

@@ -6,7 +6,8 @@ const path = require('path')
 var DB = require('./database/database')
 var projects = require('./projects/projects')
 var blog = require('./blog/blog')
-
+var auth = require('./auth/auth')
+var authHelper = require('./helpers/authHelper')
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
       cb(null, './images')
@@ -26,16 +27,51 @@ app.use('/images', express.static(__dirname + '/images'));
 
 require('dotenv').config();
 
-DB.InitialProjectsQuery(() => {
-    console.log("Made initial past project table")
-})
 
-DB.InitialBlogPostsQuery(() => {
-    console.log("Made initial blog posts table")
-})
+app.get('/initialize', (req, res) => {
+    var stat = []
+    DB.InitialProjectsQuery((err, res) => {
+        if (err === false){
+            console.log("Projects table CREATED")
+            stat.push("Projects table CREATED")
+        } else {
+            console.log("Projects table NOT CREATED")
+            stat.push("Projects table NOT CREATED")
+        }
+    })
+    
+    DB.InitialBlogPostsQuery((err, res) => {
+        if (err === false){
+            console.log("Blog Posts table CREATED")
+            stat.push("Blog Posts table CREATED")
 
-DB.InitialCommentsQuery(() => {
-    console.log("Made initial comments table")
+        } else {
+            console.log("Blog Posts table NOT CREATED")
+            stat.push("Blog Posts table NOT CREATED")
+        }
+    })
+    
+    DB.InitialCommentsQuery((err, res) => {
+        if (err === false){
+            console.log("Comments table CREATED")
+            stat.push("Comments table CREATED")
+        } else {
+            console.log("Comments table NOT CREATED")
+            stat.push("Comments table NOT CREATED")
+        }
+    })
+
+    DB.InitialUsersQuery((err, res) => {
+        if (err === false){
+            console.log("Users table CREATED")
+            stat.push("Users table CREATED")
+        } else {
+            console.log("Users table NOT CREATED")
+            stat.push("Users table NOT CREATED")
+        }
+    })
+
+    res.send(stat)
 })
 
 // Image upload endpoint
@@ -72,3 +108,13 @@ app.delete('/blog/:id', blog.DeleteSpecific)
 app.listen(process.env.SERVER_PORT, () => {
     console.log(`Server is running on port : ${process.env.SERVER_PORT}`)
 });
+
+// Auth Endpoints
+
+app.post('/sign-up', auth.Test )
+
+app.post('/token', auth.SignUp)
+
+app.get('/test', authHelper.AuthenticateToken, auth.Test)
+
+app.get('/users/all', auth.AllUsers)

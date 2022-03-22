@@ -1,7 +1,7 @@
 'use strict'
 
 var DB = require('../database/database')
-var helper = require('../helpers/helper')
+var helper = require('../helpers/blogHelper')
 
 require('dotenv').config();
 
