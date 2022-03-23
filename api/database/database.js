@@ -168,7 +168,6 @@ exports.CheckForEmail = function(DB_NAME, user, callback){
         connection.query(sql, function(err, result){
             connection.release()
             if(err) { console.log(err); callback(true); return; }
-            console.log(result)
             callback(false, result)
         })
     })

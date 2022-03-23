@@ -16,6 +16,13 @@ exports.SaltPassword = function(password){
     return (salt + value)
 }
 
+exports.HashPasswordWithSalt = function(password, salt){
+    var hash = crypto.createHmac('sha512', salt);
+    hash.update(password);
+    var value = hash.digest('hex');
+    return value
+}
+
 exports.AuthenticateToken = function(req, res, next){
     const authHeader = req.headers['authorization']
     const token = authHeader && authHeader.split(' ')[1]
@@ -32,6 +39,16 @@ exports.AuthenticateToken = function(req, res, next){
 exports.GenAccessToken = function(username) {
     return jwt.sign({username : username}, JWT_SECRET, {expiresIn: 60*60})
 
+}
+
+exports.RefreshToken = function(req, res){
+    const token = req.body.token && req.body.token.split(' ')[1]
+    const payload = jwt.verify(token, JWT_SECRET)
+    delete payload.iat;
+    delete payload.exp;
+    delete payload.nbf;
+    delete payload.jti;
+    return res.send(jwt.sign(payload, JWT_SECRET, {expiresIn: 60*60}))
 }
 
 exports.ValidateEmail = function(username){

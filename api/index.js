@@ -4,6 +4,7 @@ const multer = require('multer');
 const path = require('path')
 
 var DB = require('./database/database')
+var INIT = require('./database/init')
 var projects = require('./projects/projects')
 var blog = require('./blog/blog')
 var auth = require('./auth/auth')
@@ -28,51 +29,7 @@ app.use('/images', express.static(__dirname + '/images'));
 require('dotenv').config();
 
 
-app.get('/initialize', (req, res) => {
-    var stat = []
-    DB.InitialProjectsQuery((err, res) => {
-        if (err === false){
-            console.log("Projects table CREATED")
-            stat.push("Projects table CREATED")
-        } else {
-            console.log("Projects table NOT CREATED")
-            stat.push("Projects table NOT CREATED")
-        }
-    })
-    
-    DB.InitialBlogPostsQuery((err, res) => {
-        if (err === false){
-            console.log("Blog Posts table CREATED")
-            stat.push("Blog Posts table CREATED")
-
-        } else {
-            console.log("Blog Posts table NOT CREATED")
-            stat.push("Blog Posts table NOT CREATED")
-        }
-    })
-    
-    DB.InitialCommentsQuery((err, res) => {
-        if (err === false){
-            console.log("Comments table CREATED")
-            stat.push("Comments table CREATED")
-        } else {
-            console.log("Comments table NOT CREATED")
-            stat.push("Comments table NOT CREATED")
-        }
-    })
-
-    DB.InitialUsersQuery((err, res) => {
-        if (err === false){
-            console.log("Users table CREATED")
-            stat.push("Users table CREATED")
-        } else {
-            console.log("Users table NOT CREATED")
-            stat.push("Users table NOT CREATED")
-        }
-    })
-
-    res.send(stat)
-})
+app.get('/initialize', INIT.InitialQuery)
 
 // Image upload endpoint
 
@@ -111,10 +68,10 @@ app.listen(process.env.SERVER_PORT, () => {
 
 // Auth Endpoints
 
-app.post('/sign-up', auth.Test )
+app.post('/signup', auth.SignUp)
 
-app.post('/token', auth.SignUp)
+app.post('/login', auth.Login)
 
-app.get('/test', authHelper.AuthenticateToken, auth.Test)
+app.post('/refresh', authHelper.AuthenticateToken, authHelper.RefreshToken)
 
 app.get('/users/all', auth.AllUsers)
