@@ -65,7 +65,8 @@ exports.InitialBlogPostsQuery = function(callback){
 exports.InitialUsersQuery = function(callback){
     var sql = `CREATE TABLE IF NOT EXISTS ${USERS_DB_TABLE} (
         id INT PRIMARY KEY UNIQUE AUTO_INCREMENT,
-        user VARCHAR(60) NOT NULL,
+        email VARCHAR(60) NOT NULL,
+        username VARCHAR(60) NOT NULL,
         password VARCHAR(255) NOT NULL
     )`
 
@@ -161,8 +162,20 @@ exports.DeleteFromID = function(DB_NAME, ID, callback){
 
 }
 
-exports.CheckForEmail = function(DB_NAME, user, callback){
-    var sql = `SELECT * FROM ${DB_NAME} WHERE user = "${user}"`
+exports.CheckForEmail = function(DB_NAME, email, callback){
+    var sql = `SELECT * FROM ${DB_NAME} WHERE email = "${email}"`
+    pool.getConnection(function(err, connection){
+        if(err){ console.log(err); callback(true); return; }
+        connection.query(sql, function(err, result){
+            connection.release()
+            if(err) { console.log(err); callback(true); return; }
+            callback(false, result)
+        })
+    })
+}
+
+exports.GetAllUsersFromDB = function(DB_NAME, callback){
+    var sql = `SELECT id, email, username FROM ${DB_NAME}`
     pool.getConnection(function(err, connection){
         if(err){ console.log(err); callback(true); return; }
         connection.query(sql, function(err, result){

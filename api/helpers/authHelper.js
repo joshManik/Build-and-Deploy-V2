@@ -27,17 +27,22 @@ exports.AuthenticateToken = function(req, res, next){
     const authHeader = req.headers['authorization']
     const token = authHeader && authHeader.split(' ')[1]
     if (token == null) return res.sendStatus(401)
-    jwt.verify(token, JWT_SECRET, (err, user) => {
+    jwt.verify(token, JWT_SECRET, (err, result) => {
         console.log(err)
         if (err) return res.sendStatus(403)
-        console.log(user)
-        req.user = user
         next()
       })
 }
 
-exports.GenAccessToken = function(username) {
-    return jwt.sign({username : username}, JWT_SECRET, {expiresIn: 60*60})
+exports.GetDataFromToken = function(token){
+    jwt.verify(token, JWT_SECRET, (err, result) => {
+        if (err) return false;
+        return result
+    })
+}
+
+exports.GenAccessToken = function(email, username) {
+    return jwt.sign({email : email, username : username}, JWT_SECRET, {expiresIn: 60*60})
 
 }
 
@@ -48,7 +53,9 @@ exports.RefreshToken = function(req, res){
     delete payload.exp;
     delete payload.nbf;
     delete payload.jti;
-    return res.send(jwt.sign(payload, JWT_SECRET, {expiresIn: 60*60}))
+    return res.send({
+        "RefreshToken" : jwt.sign(payload, JWT_SECRET, {expiresIn: 60*60})
+    })
 }
 
 exports.ValidateEmail = function(username){

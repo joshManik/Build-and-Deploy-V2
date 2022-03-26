@@ -11,24 +11,27 @@ const USERS_DB_TABLE = process.env.USERS_DB_TABLE_NAME
 
 exports.SignUp = function(req, res) {
     var username = req.body.username
+    var email = req.body.email
     var password = req.body.password
 
-    DB.CheckForEmail(USERS_DB_TABLE, username, function(err, result){
+    DB.CheckForEmail(USERS_DB_TABLE, email, function(err, result){
         if(err) { console.log(err); res.sendStatus(500); return; }
         if (result.length === 0){
-            if (helper.ValidateEmail(username)){
+            if (helper.ValidateEmail(email)){
                 var hashedPassword = helper.SaltPassword(password)
                 const INPUT = {
-                    user : username,
+                    email : email,
+                    username : username,
                     password : hashedPassword
                 };
                 DB.InsertIntoDB(USERS_DB_TABLE, INPUT, function(err, result){
                     if(err) { console.log(err); res.sendStatus(500); return; }
                     var ID = result.insertId;
                     INPUT["ID"] = ID;
-                    const token = helper.GenAccessToken(INPUT.user)
-                    res.set('token', [token])
-                    res.status(200).send("User successfully signed up");
+                    const token = helper.GenAccessToken({email : INPUT.email, username : INPUT.username})
+                    res.send({
+                        "token" : token
+                    })
                     return;
                 })
             } else {
@@ -44,26 +47,27 @@ exports.SignUp = function(req, res) {
 }
 
 exports.Login = function(req, res){
-    var username = req.body.username
+    var email = req.body.email
     var password = req.body.password
 
 
-    DB.CheckForEmail(USERS_DB_TABLE, username, function(err, result){
+    DB.CheckForEmail(USERS_DB_TABLE, email, function(err, result){
         if(err) { console.log(err); res.sendStatus(500); return; }
         if (result.length === 0){
             res.status(400).send("Incorrect Details")
         } else {
             var saltHashPword = result[0]['password']
             const salt = saltHashPword.slice(0, 24)
-            console.log(salt)
             var hashPword = saltHashPword.slice(24)
 
             const password2Check = helper.HashPasswordWithSalt(password, salt)
             if (password2Check === hashPword){
-                var token = helper.GenAccessToken(username)
+                var token = helper.GenAccessToken({email : result[0].email, username : result[0].username})
                 token = 'Bearer ' + token
                 res.set('authorization', [token])
-                res.send("Logged in")
+                res.send({
+                    "token" : token
+                })
 
             } else {
                 res.status(400).send("Incorrect Details")
@@ -75,7 +79,7 @@ exports.Login = function(req, res){
 
 
 exports.AllUsers = function(req, res){
-    DB.GetAllFromDB(USERS_DB_TABLE, function(err, result){
+    DB.GetAllUsersFromDB(USERS_DB_TABLE, function(err, result){
         if(err) { console.log(err); res.sendStatus(500); return; }
         console.log(result)
         res.send(result)

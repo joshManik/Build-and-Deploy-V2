@@ -1,9 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const multer = require('multer');
-const path = require('path')
 
-var DB = require('./database/database')
 var INIT = require('./database/init')
 var projects = require('./projects/projects')
 var blog = require('./blog/blog')
@@ -54,7 +52,7 @@ app.delete('/projects/:id', projects.DeleteSpecific)
 
 app.get('/blog/all', blog.GetAll)
 
-app.post('/blog/create', blog.Create)
+app.post('/blog/create', authHelper.AuthenticateToken, blog.Create)
 
 app.get('/blog/:id', blog.GetSpecific)
 
@@ -75,3 +73,9 @@ app.post('/login', auth.Login)
 app.post('/refresh', authHelper.AuthenticateToken, authHelper.RefreshToken)
 
 app.get('/users/all', auth.AllUsers)
+
+app.get('/auth', authHelper.AuthenticateToken, (req, res) => {
+  console.log(req)
+  res.sendStatus(200)
+
+})
