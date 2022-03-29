@@ -9,7 +9,6 @@ const JWT_SECRET = process.env.JWT_SECRET
 
 exports.SaltPassword = function(password){
     const salt = crypto.randomBytes(16).toString('base64');
-    console.log(salt, salt.length)
     var hash = crypto.createHmac('sha512', salt)
     hash.update(password);
     var value = hash.digest('hex');
@@ -28,17 +27,16 @@ exports.AuthenticateToken = function(req, res, next){
     const token = authHeader && authHeader.split(' ')[1]
     if (token == null) return res.sendStatus(401)
     jwt.verify(token, JWT_SECRET, (err, result) => {
-        console.log(err)
-        if (err) return res.sendStatus(403)
+        if (err) { console.log(err); res.sendStatus(403); return;}
+        res.locals.result = result
         next()
       })
 }
 
 exports.GetDataFromToken = function(token){
-    jwt.verify(token, JWT_SECRET, (err, result) => {
-        if (err) return false;
-        return result
-    })
+    const payload = jwt.verify(token, JWT_SECRET)
+    console.log(payload, "payload is here")
+    return payload
 }
 
 exports.GenAccessToken = function(email, username) {

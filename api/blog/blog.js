@@ -38,7 +38,7 @@ exports.DeleteSpecific = function(req, res){
 }
 
 exports.Create = function(req, res){
-    helper.BlogMiddleware(req).then(INPUT => {
+    helper.BlogMiddleware(res, req).then(INPUT => {
         DB.InsertIntoDB(BLOG_DB_TABLE, INPUT, function(err, result){
             if(err) { console.log(err); res.send(500, "Server Error"); return; }
             var ID = result.insertId

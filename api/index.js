@@ -60,10 +60,6 @@ app.put('/blog/:id', blog.UpdateSpecific)
 
 app.delete('/blog/:id', blog.DeleteSpecific)
 
-app.listen(process.env.SERVER_PORT, () => {
-    console.log(`Server is running on port : ${process.env.SERVER_PORT}`)
-});
-
 // Auth Endpoints
 
 app.post('/signup', auth.SignUp)
@@ -74,8 +70,10 @@ app.post('/refresh', authHelper.AuthenticateToken, authHelper.RefreshToken)
 
 app.get('/users/all', auth.AllUsers)
 
-app.get('/auth', authHelper.AuthenticateToken, (req, res) => {
-  console.log(req)
-  res.sendStatus(200)
+app.get('/auth', authHelper.AuthenticateToken, (req, res) => {res.sendStatus(200)})
 
-})
+app.get('/admin/auth', authHelper.AuthenticateToken, auth.AdminAuth)
+
+app.listen(process.env.SERVER_PORT, () => {
+  console.log(`Server is running on port : ${process.env.SERVER_PORT}`)
+});

@@ -22,7 +22,8 @@ exports.SignUp = function(req, res) {
                 const INPUT = {
                     email : email,
                     username : username,
-                    password : hashedPassword
+                    password : hashedPassword,
+                    admin : false
                 };
                 DB.InsertIntoDB(USERS_DB_TABLE, INPUT, function(err, result){
                     if(err) { console.log(err); res.sendStatus(500); return; }
@@ -43,6 +44,16 @@ exports.SignUp = function(req, res) {
             return;
             }
 
+    })
+}
+
+exports.AdminAuth = function(req, res){
+    DB.CheckForEmail(USERS_DB_TABLE, res.locals.result.email.email, function(err, result){
+        if (result[0].admin){
+            res.send(200)
+        } else {
+            res.status(200).send("Not Allowed")
+        }
     })
 }
 

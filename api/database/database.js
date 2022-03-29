@@ -67,7 +67,9 @@ exports.InitialUsersQuery = function(callback){
         id INT PRIMARY KEY UNIQUE AUTO_INCREMENT,
         email VARCHAR(60) NOT NULL,
         username VARCHAR(60) NOT NULL,
-        password VARCHAR(255) NOT NULL
+        password VARCHAR(255) NOT NULL,
+        admin BOOLEAN NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )`
 
     pool.getConnection(function(err, connection){
@@ -175,7 +177,7 @@ exports.CheckForEmail = function(DB_NAME, email, callback){
 }
 
 exports.GetAllUsersFromDB = function(DB_NAME, callback){
-    var sql = `SELECT id, email, username FROM ${DB_NAME}`
+    var sql = `SELECT id, email, username, created_at FROM ${DB_NAME}`
     pool.getConnection(function(err, connection){
         if(err){ console.log(err); callback(true); return; }
         connection.query(sql, function(err, result){
