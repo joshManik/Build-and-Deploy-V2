@@ -69,6 +69,7 @@ exports.InitialUsersQuery = function(callback){
         username VARCHAR(60) NOT NULL,
         password VARCHAR(255) NOT NULL,
         admin BOOLEAN NOT NULL,
+        verified BOOLEAN NOT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )`
 
@@ -177,10 +178,22 @@ exports.CheckForEmail = function(DB_NAME, email, callback){
 }
 
 exports.GetAllUsersFromDB = function(DB_NAME, callback){
-    var sql = `SELECT id, email, username, created_at FROM ${DB_NAME}`
+    var sql = `SELECT id, email, username, verified ,created_at FROM ${DB_NAME}`
     pool.getConnection(function(err, connection){
         if(err){ console.log(err); callback(true); return; }
         connection.query(sql, function(err, result){
+            connection.release()
+            if(err) { console.log(err); callback(true); return; }
+            callback(false, result)
+        })
+    })
+}
+
+exports.UpdateUserFromEmail = function(DB_NAME, email, callback){
+    var sql = `UPDATE ${DB_NAME} SET verified = ? WHERE email = "${email}"`
+    pool.getConnection(function(err, connection){
+        if(err){ console.log(err); callback(true); return; }
+        connection.query(sql, true,function(err, result){
             connection.release()
             if(err) { console.log(err); callback(true); return; }
             callback(false, result)

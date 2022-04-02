@@ -2,10 +2,18 @@
 const crypto = require('crypto');
 
 const jwt = require('jsonwebtoken');
+const nodemailer = require("nodemailer");
+const path = require("path");
+var fs = require('fs');
+var handlebars = require('handlebars');
+
+
 
 require('dotenv').config();
 
 const JWT_SECRET = process.env.JWT_SECRET
+const ALTJWT_SECRET = process.env.ALTJWT_SECRET
+const EMAILPASSWORD = process.env.EMAILPASSWORD
 
 exports.SaltPassword = function(password){
     const salt = crypto.randomBytes(16).toString('base64');
@@ -27,6 +35,16 @@ exports.AuthenticateToken = function(req, res, next){
     const token = authHeader && authHeader.split(' ')[1]
     if (token == null) return res.sendStatus(401)
     jwt.verify(token, JWT_SECRET, (err, result) => {
+        if (err) { console.log(err); res.sendStatus(403); return;}
+        res.locals.result = result
+        next()
+      })
+}
+
+exports.AuthenticateVerifyToken = function(req, res, next){
+    const token = req.params.token
+    if (token == null) return res.sendStatus(401)
+    jwt.verify(token, ALTJWT_SECRET, (err, result) => {
         if (err) { console.log(err); res.sendStatus(403); return;}
         res.locals.result = result
         next()
@@ -64,3 +82,43 @@ exports.ValidateEmail = function(username){
         return false
     }
 }
+
+exports.GenEmailValidationToken = function(email, username) {
+    return jwt.sign({email : email, username : username}, ALTJWT_SECRET, {expiresIn: 60*60})
+
+}
+
+exports.SendEmail = function(context, recipient) {
+
+    const filePath = path.resolve(__dirname, "./templates/email.html")
+    const source = fs.readFileSync(filePath, 'utf-8').toString();
+    const template = handlebars.compile(source)
+    const emailHTML = template(context)
+
+    const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          user: '36boxesemailservice@gmail.com',
+          pass: EMAILPASSWORD
+        }
+      });
+      
+      const mailOptions = {
+        from: '36boxesemailservice@gmail.com',
+        to: recipient,
+        subject: '36Boxes Email Verification',
+        html: emailHTML
+      };
+      
+      transporter.sendMail(mailOptions, function(error, info){
+        if (error) {
+          console.log(error);
+          return false
+        } else {
+          console.log('Email sent: ' + info.response);
+          return true
+        }
+      });
+
+}
+

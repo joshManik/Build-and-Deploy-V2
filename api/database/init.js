@@ -7,7 +7,7 @@ require('dotenv').config();
 const USERS_DB_TABLE = process.env.USERS_DB_TABLE_NAME
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD
 
-// Initial Setup Query
+// Initial Setup Query need a much better way to do this but oh well
 
 exports.InitialQuery = function(req, res){
     let stat = 'DBS : '
@@ -45,12 +45,19 @@ exports.InitialQuery = function(req, res){
                                         if (result.length === 0){
                                         const INPUT = {
                                             username : "36Boxes",
-                                            email : "joshmanik1@gmail.com",
+                                            email : "joshmanik1998@gmail.com",
                                             admin : true,
+                                            verified : true,
                                             password : helper.SaltPassword(ADMIN_PASSWORD)
                                         }
                                         DB.InsertIntoDB(USERS_DB_TABLE, INPUT, function(err, result){
-                                            if(err) { console.log(err); res.send(500, "Server Error"); return; }
+                                            if(err) { console.log(err); res.send({
+                                                usersDB : users_status,
+                                                ProjectsDB : project_status,
+                                                BlogsDB : blog_status,
+                                                CommentsDB : comments_status,
+                                                adminAccount : "NOT CREATED"
+                                            }); return; }
                                         })
                                         res.send({
                                             usersDB : users_status,

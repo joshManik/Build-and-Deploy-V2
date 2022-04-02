@@ -42,8 +42,7 @@ exports.ProjectsMiddleware = function(req){
             image1_path : req.files[0].path,
             image2_path : req.files[1].path,
             image3_path : req.files[2].path,
-            carousel : carousel,
-            ID : 0
+            carousel : carousel
         }
     } if (fileCount == 2){
         var INPUT = {
@@ -57,8 +56,7 @@ exports.ProjectsMiddleware = function(req){
             github_link : req.body.github_link,
             image1_path : req.files[0].path,
             image2_path : req.files[1].path,
-            carousel : carousel,
-            ID : 0
+            carousel : carousel
         }
     } if (fileCount == 1) {
         var INPUT = {
@@ -71,8 +69,7 @@ exports.ProjectsMiddleware = function(req){
             github_live : github_live,
             github_link : req.body.github_link,
             image1_path : req.files[0].path,
-            carousel : carousel,
-            ID : 0
+            carousel : carousel
         }
     }
     resolve(INPUT)
@@ -116,7 +113,7 @@ exports.UpdateProjectsMiddleware = function(req){
                 image2_path : req.body.image2_path,
                 image3_path : req.body.image3_path,
                 carousel : carousel,
-                ID : 0
+                ID : req.params.id
             }
             
             resolve(INPUT)

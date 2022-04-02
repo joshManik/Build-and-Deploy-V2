@@ -1,5 +1,11 @@
 'use strict'
-const crypto = require('crypto');
+const { validationResult } = require('express-validator');
+const nodemailer = require("nodemailer");
+const path = require("path");
+var fs = require('fs');
+var handlebars = require('handlebars');
+
+
 
 var DB = require('../database/database')
 var helper = require('../helpers/authHelper')
@@ -7,6 +13,7 @@ var helper = require('../helpers/authHelper')
 require('dotenv').config();
 
 const USERS_DB_TABLE = process.env.USERS_DB_TABLE_NAME
+const REACT_APP_URL = process.env.REACT_APP_URL
 
 
 exports.SignUp = function(req, res) {
@@ -23,16 +30,33 @@ exports.SignUp = function(req, res) {
                     email : email,
                     username : username,
                     password : hashedPassword,
-                    admin : false
+                    admin : false,
+                    verified : false
                 };
                 DB.InsertIntoDB(USERS_DB_TABLE, INPUT, function(err, result){
                     if(err) { console.log(err); res.sendStatus(500); return; }
                     var ID = result.insertId;
                     INPUT["ID"] = ID;
                     const token = helper.GenAccessToken({email : INPUT.email, username : INPUT.username})
-                    res.send({
-                        "token" : token
-                    })
+                    const verificationToken = helper.GenEmailValidationToken(INPUT.email, INPUT.username)
+                    const context = {
+                        name : INPUT.username,
+                        verify : REACT_APP_URL + "users/verify/" + verificationToken
+                    }
+
+                    /// This doesnt work needs fixing 
+
+                    if (helper.SendEmail(context, INPUT.email)){
+                        res.send({
+                            "token" : token,
+                            "verify" : "SENT"
+                        })
+                    } else {
+                        res.send({
+                            "token" : token,
+                            "verify" : "SENT"
+                        })
+                    }
                     return;
                 })
             } else {
@@ -58,6 +82,12 @@ exports.AdminAuth = function(req, res){
 }
 
 exports.Login = function(req, res){
+
+    const errors = validationResult(req)
+
+    if(!errors.isEmpty()){
+        return res.status(400).send("Invalid Value Provided")
+    } else {
     var email = req.body.email
     var password = req.body.password
 
@@ -86,6 +116,7 @@ exports.Login = function(req, res){
         }
     })
 }
+}
 
 
 
@@ -97,4 +128,66 @@ exports.AllUsers = function(req, res){
     })
 }
 
+exports.VerifyEmail = function(req, res){
+    console.log(res.locals)
+    DB.CheckForEmail(USERS_DB_TABLE, res.locals.result.email, (err, result) => {
+        if(err) { console.log(err); res.sendStatus(500); return; }
+        if (result.length === 0){
+            res.status(400).send("Error occured 1")
+        } else {
+            if (helper.ValidateEmail(res.locals.result.email)){
+                DB.UpdateUserFromEmail(USERS_DB_TABLE, res.locals.result.email, (err, result) => {
+                    if(err) { console.log(err); res.sendStatus(500); return; }
+                    res.status(200).send("EmailVerified")
+                })
+            } else {
+                res.status(400).send("Error Occured 2")
+            }
+        }
+    })
+}
 
+exports.GetEmailToken = function(req, res){
+    var email = req.body.email
+    var username = req.body.username
+
+    const token = helper.GenEmailValidationToken(email, username)
+
+    res.send({"token" : token})
+}
+
+
+
+exports.SendEmail = function(context, recipient) {
+
+    const filePath = path.resolve(__dirname, "./templates/email.html")
+    const source = fs.readFileSync(filePath, 'utf-8').toString();
+    const template = handlebars.compile(source)
+    const emailHTML = template(context)
+
+    const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          user: '36boxesemailservice@gmail.com',
+          pass: '36-Boxes212'
+        }
+      });
+      
+      const mailOptions = {
+        from: '36boxesemailservice@gmail.com',
+        to: recipient,
+        subject: '36Boxes Email Verification',
+        html: emailHTML
+      };
+      
+      transporter.sendMail(mailOptions, function(error, info){
+        if (error) {
+          console.log(error);
+          return false
+        } else {
+          console.log('Email sent: ' + info.response);
+          return true
+        }
+      });
+
+}

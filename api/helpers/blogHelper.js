@@ -14,18 +14,18 @@ exports.BlogMiddleware = function(res, req){
             reject(false)
         } else {
 
-            if (req.params.id === undefined){
-                var INPUT = {
-                    title : req.body.title, 
-                    post : req.body.post,
-                    author : res.locals.result.email.username,
-                }
-            } else {
+            if (req.params.id){
                 var INPUT = {
                     title : req.body.title, 
                     post : req.body.post,
                     author : res.locals.result.email.username,
                     ID : req.params.id
+                }
+            } else {
+                var INPUT = {
+                    title : req.body.title, 
+                    post : req.body.post,
+                    author : res.locals.result.email.username
                 }
             }
             resolve(INPUT)
