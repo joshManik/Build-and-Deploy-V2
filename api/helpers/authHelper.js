@@ -77,8 +77,8 @@ exports.GetDataFromToken = function(token){
     return payload
 }
 
-exports.GenAccessToken = function(email, username) {
-    return jwt.sign({email : email, username : username}, JWT_SECRET, {expiresIn: 60*60})
+exports.GenAccessToken = function(email, username, verified, admin) {
+    return jwt.sign({email : email, username : username, verified : verified, admin : admin}, JWT_SECRET, {expiresIn: 60*60})
 
 }
 

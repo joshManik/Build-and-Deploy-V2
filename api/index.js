@@ -71,6 +71,12 @@ app.put('/blogs/:id', authHelper.AuthenticateAdminToken, blog.UpdateSpecific)
 
 app.delete('/blogs/:id', authHelper.AuthenticateAdminToken, blog.DeleteSpecific)
 
+// User Endpoints
+
+app.get('/users/all', authHelper.AuthenticateAdminToken, auth.AllUsers)
+
+app.get('/users/user/:id', authHelper.AuthenticateToken, auth.GetSingleUser)
+
 // Auth Endpoints
 
 app.post('/signup', auth.SignUp)
@@ -84,6 +90,8 @@ app.get('/users/all', authHelper.AuthenticateAdminToken, auth.AllUsers)
 app.get('/auth', authHelper.AuthenticateToken, (req, res) => {res.sendStatus(200)})
 
 app.get('/admin/auth', authHelper.AuthenticateToken, auth.AdminAuth)
+
+// Email Related Endpoints
 
 app.get('/verify/email/:token', authHelper.AuthenticateVerifyToken, auth.VerifyEmail)
 

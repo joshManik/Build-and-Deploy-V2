@@ -37,7 +37,7 @@ exports.SignUp = function(req, res) {
                     if(err) { console.log(err); res.sendStatus(500); return; }
                     var ID = result.insertId;
                     INPUT["ID"] = ID;
-                    const token = helper.GenAccessToken({email : INPUT.email, username : INPUT.username})
+                    const token = helper.GenAccessToken({email : INPUT.email, username : INPUT.username, verified : INPUT.verified, admin : INPUT.admin})
                     const verificationToken = helper.GenEmailValidationToken(INPUT.email, INPUT.username)
                     const context = {
                         name : INPUT.username,
@@ -103,7 +103,7 @@ exports.Login = function(req, res){
 
             const password2Check = helper.HashPasswordWithSalt(password, salt)
             if (password2Check === hashPword){
-                var token = helper.GenAccessToken({email : result[0].email, username : result[0].username})
+                var token = helper.GenAccessToken({email : result[0].email, username : result[0].username, verified : result[0].verified, admin : result[0].admin})
                 token = 'Bearer ' + token
                 res.set('authorization', [token])
                 res.send({
@@ -128,6 +128,12 @@ exports.AllUsers = function(req, res){
     })
 }
 
+exports.GetSingleUser = function(req, res){
+    console.log(res.locals)
+    console.log(req.params)
+    res.send(200)
+}
+
 exports.VerifyEmail = function(req, res){
     DB.CheckForEmail(USERS_DB_TABLE, res.locals.result.email, (err, result) => {
         if(err) { console.log(err); res.sendStatus(500); return; }
@@ -137,6 +143,18 @@ exports.VerifyEmail = function(req, res){
             if (helper.ValidateEmail(res.locals.result.email)){
                 DB.UpdateUserFromEmail(USERS_DB_TABLE, res.locals.result.email, (err, result) => {
                     if(err) { console.log(err); res.sendStatus(500); return; }
+
+                    // Need to send a new token here with updated values
+
+                    DB.CheckForEmail(USERS_DB_TABLE, res.locals.result.email, (err, result) => {
+                        var token = helper.GenAccessToken({email : result[0].email, username : result[0].username, verified : result[0].verified, admin : result[0].admin})
+                        token = 'Bearer ' + token
+                        res.set('authorization', [token])
+                        res.send({
+                            "token" : token
+                        })
+                    })
+
                     res.status(200).send("EmailVerified")
                 })
             } else {
