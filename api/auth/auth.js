@@ -14,7 +14,6 @@ require('dotenv').config();
 
 const USERS_DB_TABLE = process.env.USERS_DB_TABLE_NAME
 const REACT_APP_URL = process.env.REACT_APP_URL
-const EMAILPASSWORD = process.env.EMAILPASSWORD
 
 
 exports.SignUp = function(req, res) {
@@ -146,16 +145,6 @@ exports.VerifyEmail = function(req, res){
         }
     })
 }
-
-exports.GetEmailToken = function(req, res){
-    var email = req.body.email
-    var username = req.body.username
-
-    const token = helper.GenEmailValidationToken(email, username)
-
-    res.send({"token" : token})
-}
-
 
 exports.GetInContact = function(req, res) {
 

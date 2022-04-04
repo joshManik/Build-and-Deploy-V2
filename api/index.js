@@ -21,8 +21,8 @@ var storage = multer.diskStorage({
 var upload = multer({ storage: storage })
 
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 50, // limit each IP to 50 requests per windowMs
+  windowMs: 30 * 1000, // 1 minute
+  max: 100, // limit each IP to 50 requests per windowMs
   message: "Too many requests, please try again after 15 minutes"
 
   // this above message is shown to user when max requests is exceeded
@@ -51,25 +51,25 @@ app.post('/image/upload', authHelper.AuthenticateToken ,upload.single('image', 1
 
 app.get('/projects/all', projects.GetAll)
 
-app.post('/projects/create', upload.array('images', 3), projects.Create)
+app.post('/projects/create', authHelper.AuthenticateAdminToken, upload.array('images', 3), projects.Create)
 
 app.get('/projects/:id', param(['id']).isInt(), projects.GetSpecific)
 
-app.put('/projects/:id', param(['id']).isInt(), upload.array('images', 3), projects.UpdateSpecific)
+app.put('/projects/:id', authHelper.AuthenticateAdminToken, param(['id']).isInt(), upload.array('images', 3), projects.UpdateSpecific)
 
-app.delete('/projects/:id', projects.DeleteSpecific)
+app.delete('/projects/:id', authHelper.AuthenticateAdminToken, projects.DeleteSpecific)
 
 // Blog Endpoints
 
 app.get('/blogs/all', blog.GetAll)
 
-app.post('/blogs/create', authHelper.AuthenticateToken, blog.Create)
+app.post('/blogs/create', authHelper.AuthenticateAdminToken, blog.Create)
 
 app.get('/blogs/:id', blog.GetSpecific)
 
-app.put('/blogs/:id', blog.UpdateSpecific)
+app.put('/blogs/:id', authHelper.AuthenticateAdminToken, blog.UpdateSpecific)
 
-app.delete('/blogs/:id', blog.DeleteSpecific)
+app.delete('/blogs/:id', authHelper.AuthenticateAdminToken, blog.DeleteSpecific)
 
 // Auth Endpoints
 
@@ -79,15 +79,13 @@ app.post('/login', body(['email']).isEmail(), auth.Login)
 
 app.post('/refresh', authHelper.AuthenticateToken, authHelper.RefreshToken)
 
-app.get('/users/all', auth.AllUsers)
+app.get('/users/all', authHelper.AuthenticateAdminToken, auth.AllUsers)
 
 app.get('/auth', authHelper.AuthenticateToken, (req, res) => {res.sendStatus(200)})
 
 app.get('/admin/auth', authHelper.AuthenticateToken, auth.AdminAuth)
 
 app.get('/verify/email/:token', authHelper.AuthenticateVerifyToken, auth.VerifyEmail)
-
-app.post('/email/test', auth.GetEmailToken)
 
 app.post('/send/email', auth.GetInContact)
 

@@ -6,6 +6,7 @@ const nodemailer = require("nodemailer");
 const path = require("path");
 var fs = require('fs');
 var handlebars = require('handlebars');
+var DB = require('../database/database')
 
 
 
@@ -14,6 +15,7 @@ require('dotenv').config();
 const JWT_SECRET = process.env.JWT_SECRET
 const ALTJWT_SECRET = process.env.ALTJWT_SECRET
 const EMAILPASSWORD = process.env.EMAILPASSWORD
+const USERS_DB_TABLE = process.env.USERS_DB_TABLE_NAME
 
 exports.SaltPassword = function(password){
     const salt = crypto.randomBytes(16).toString('base64');
@@ -41,12 +43,30 @@ exports.AuthenticateToken = function(req, res, next){
       })
 }
 
+exports.AuthenticateAdminToken = function(req, res, next){
+  const authHeader = req.headers['authorization']
+  const token = authHeader && authHeader.split(' ')[1]
+  if (token == null) return res.sendStatus(401)
+  jwt.verify(token, JWT_SECRET, (err, result) => {
+      if (err) { console.log(err); res.sendStatus(403); return;}
+      DB.CheckForEmail(USERS_DB_TABLE, result.email.email, function(err, resu){
+        if (resu[0].admin){
+            res.locals.result = result
+            next()
+        } else {
+            res.status(200).send("Not Allowed")
+        }
+    })
+    })
+}
+
 exports.AuthenticateVerifyToken = function(req, res, next){
     const token = req.params.token
     if (token == null) return res.sendStatus(401)
     jwt.verify(token, ALTJWT_SECRET, (err, result) => {
         if (err) { console.log(err); res.sendStatus(403); return;}
         res.locals.result = result
+        
         next()
       })
 }
@@ -69,8 +89,9 @@ exports.RefreshToken = function(req, res){
     delete payload.exp;
     delete payload.nbf;
     delete payload.jti;
+    const refresh = 'Bearer ' + jwt.sign(payload, JWT_SECRET, {expiresIn: 60*60})
     return res.send({
-        "RefreshToken" : jwt.sign(payload, JWT_SECRET, {expiresIn: 60*60})
+        "token" : refresh
     })
 }
 

@@ -41,11 +41,10 @@ exports.InitialQuery = function(req, res){
                                         }); return; }
 
                                         // Check for email upon initialize to make sure we dont make 2 of the same admin accounts
-
                                         if (result.length === 0){
                                         const INPUT = {
                                             username : "36Boxes",
-                                            email : "joshmanik1998@gmail.com",
+                                            email : "joshmanik1@gmail.com",
                                             admin : true,
                                             verified : true,
                                             password : helper.SaltPassword(ADMIN_PASSWORD)

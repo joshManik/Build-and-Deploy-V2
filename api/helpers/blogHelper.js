@@ -14,6 +14,8 @@ exports.BlogMiddleware = function(res, req){
             reject(false)
         } else {
 
+            console.log(res.locals.result)
+
             if (req.params.id){
                 var INPUT = {
                     title : req.body.title, 
