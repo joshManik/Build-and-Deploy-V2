@@ -157,69 +157,19 @@ exports.GetEmailToken = function(req, res){
 }
 
 
-
-exports.SendVerifyEmail = function(context, recipient) {
-
-    const filePath = path.resolve(__dirname, "./templates/emailVerification.html")
-    const source = fs.readFileSync(filePath, 'utf-8').toString();
-    const template = handlebars.compile(source)
-    const emailHTML = template(context)
-
-    const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-          user: '36boxesemailservice@gmail.com',
-          pass: EMAILPASSWORD
-        }
-      });
-      
-      const mailOptions = {
-        from: '36boxesemailservice@gmail.com',
-        to: recipient,
-        subject: '36Boxes Email Verification',
-        html: emailHTML
-      };
-      
-      transporter.sendMail(mailOptions, function(error, info){
-        if (error) {
-          console.log(error);
-          return false
-        } else {
-          console.log('Email sent: ' + info.response);
-          return true
-        }
-      });
-
-}
-
 exports.GetInContact = function(req, res) {
-    const filePath = path.resolve(__dirname, "./templates/email.html")
-    const source = fs.readFileSync(filePath, 'utf-8').toString();
-    const template = handlebars.compile(source)
-    const emailHTML = template(context)
 
-    const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-          user: '36boxesemailservice@gmail.com',
-          pass: EMAILPASSWORD
-        }
-      });
-      
-      const mailOptions = {
-        from: '36boxesemailservice@gmail.com',
-        to: "joshmanik1@gmail.com",
-        subject: '36Boxes Enquiry',
-        html: emailHTML
-      };
-      
-      transporter.sendMail(mailOptions, function(error, info){
-        if (error) {
-          console.log(error);
-          return false
-        } else {
-          console.log('Email sent: ' + info.response);
-          return true
-        }
-      });
+    const recipient = req.body.email
+
+    const context = {
+        name : req.body.name,
+        content : req.body.message
+    }
+
+    helper.GetInContact(context)
+
+    helper.SendReceipt(context, recipient)
+
+    res.send("email sent")
+
 }

@@ -88,9 +88,9 @@ exports.GenEmailValidationToken = function(email, username) {
 
 }
 
-exports.SendEmail = function(context, recipient) {
+exports.SendVerifyEmail = function(context, recipient) {
 
-    const filePath = path.resolve(__dirname, "./templates/email.html")
+    const filePath = path.resolve(__dirname, "./templates/emailVerification.html")
     const source = fs.readFileSync(filePath, 'utf-8').toString();
     const template = handlebars.compile(source)
     const emailHTML = template(context)
@@ -122,3 +122,65 @@ exports.SendEmail = function(context, recipient) {
 
 }
 
+exports.GetInContact = function(context) {
+  const filePath = path.resolve(__dirname, "./templates/emailGetInContactSend2Me.html")
+  const source = fs.readFileSync(filePath, 'utf-8').toString();
+  const template = handlebars.compile(source)
+  const emailHTML = template(context)
+
+  const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: '36boxesemailservice@gmail.com',
+        pass: EMAILPASSWORD
+      }
+    });
+    
+    const mailOptions = {
+      from: '36boxesemailservice@gmail.com',
+      to: "joshmanik1@gmail.com",
+      subject: '36Boxes Enquiry',
+      html: emailHTML
+    };
+    
+    transporter.sendMail(mailOptions, function(error, info){
+      if (error) {
+        console.log(error);
+      } else {
+        console.log('Email sent: ' + info.response);
+        
+      }
+    });
+}
+
+
+exports.SendReceipt = function(context, recipient) {
+  const filePath = path.resolve(__dirname, "./templates/emailReciept.html")
+  const source = fs.readFileSync(filePath, 'utf-8').toString();
+  const template = handlebars.compile(source)
+  const emailHTML = template(context)
+
+  const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: '36boxesemailservice@gmail.com',
+        pass: EMAILPASSWORD
+      }
+    });
+    
+    const mailOptions = {
+      from: '36boxesemailservice@gmail.com',
+      to: recipient,
+      subject: '36Boxes Enquiry',
+      html: emailHTML
+    };
+    
+    transporter.sendMail(mailOptions, function(error, info){
+      if (error) {
+        console.log(error);
+      } else {
+        console.log('Email sent: ' + info.response);
+        
+      }
+    });
+}

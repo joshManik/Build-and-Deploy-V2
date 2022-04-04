@@ -89,7 +89,7 @@ app.get('/verify/email/:token', authHelper.AuthenticateVerifyToken, auth.VerifyE
 
 app.post('/email/test', auth.GetEmailToken)
 
-app.post('/send/email', auth.SendEmail)
+app.post('/send/email', auth.GetInContact)
 
 app.listen(process.env.SERVER_PORT, () => {
   console.log(`Server is running on port : ${process.env.SERVER_PORT}`)
