@@ -14,6 +14,7 @@ require('dotenv').config();
 
 const USERS_DB_TABLE = process.env.USERS_DB_TABLE_NAME
 const REACT_APP_URL = process.env.REACT_APP_URL
+const EMAILPASSWORD = process.env.EMAILPASSWORD
 
 
 exports.SignUp = function(req, res) {
@@ -46,7 +47,7 @@ exports.SignUp = function(req, res) {
 
                     /// This doesnt work needs fixing 
 
-                    if (helper.SendEmail(context, INPUT.email)){
+                    if (helper.SendVerifyEmail(context, INPUT.email)){
                         res.send({
                             "token" : token,
                             "verify" : "SENT"
@@ -129,7 +130,6 @@ exports.AllUsers = function(req, res){
 }
 
 exports.VerifyEmail = function(req, res){
-    console.log(res.locals)
     DB.CheckForEmail(USERS_DB_TABLE, res.locals.result.email, (err, result) => {
         if(err) { console.log(err); res.sendStatus(500); return; }
         if (result.length === 0){
@@ -158,9 +158,9 @@ exports.GetEmailToken = function(req, res){
 
 
 
-exports.SendEmail = function(context, recipient) {
+exports.SendVerifyEmail = function(context, recipient) {
 
-    const filePath = path.resolve(__dirname, "./templates/email.html")
+    const filePath = path.resolve(__dirname, "./templates/emailVerification.html")
     const source = fs.readFileSync(filePath, 'utf-8').toString();
     const template = handlebars.compile(source)
     const emailHTML = template(context)
@@ -169,7 +169,7 @@ exports.SendEmail = function(context, recipient) {
         service: 'gmail',
         auth: {
           user: '36boxesemailservice@gmail.com',
-          pass: '36-Boxes212'
+          pass: EMAILPASSWORD
         }
       });
       
@@ -190,4 +190,36 @@ exports.SendEmail = function(context, recipient) {
         }
       });
 
+}
+
+exports.GetInContact = function(req, res) {
+    const filePath = path.resolve(__dirname, "./templates/email.html")
+    const source = fs.readFileSync(filePath, 'utf-8').toString();
+    const template = handlebars.compile(source)
+    const emailHTML = template(context)
+
+    const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          user: '36boxesemailservice@gmail.com',
+          pass: EMAILPASSWORD
+        }
+      });
+      
+      const mailOptions = {
+        from: '36boxesemailservice@gmail.com',
+        to: "joshmanik1@gmail.com",
+        subject: '36Boxes Enquiry',
+        html: emailHTML
+      };
+      
+      transporter.sendMail(mailOptions, function(error, info){
+        if (error) {
+          console.log(error);
+          return false
+        } else {
+          console.log('Email sent: ' + info.response);
+          return true
+        }
+      });
 }
