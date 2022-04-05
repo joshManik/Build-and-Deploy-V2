@@ -37,7 +37,8 @@ exports.SignUp = function(req, res) {
                     if(err) { console.log(err); res.sendStatus(500); return; }
                     var ID = result.insertId;
                     INPUT["ID"] = ID;
-                    const token = helper.GenAccessToken({email : INPUT.email, username : INPUT.username, verified : INPUT.verified, admin : INPUT.admin})
+                    var token = helper.GenAccessToken({email : INPUT.email, username : INPUT.username, verified : INPUT.verified, admin : INPUT.admin})
+                    token = 'Bearer ' + token
                     const verificationToken = helper.GenEmailValidationToken(INPUT.email, INPUT.username)
                     const context = {
                         name : INPUT.username,
@@ -129,9 +130,18 @@ exports.AllUsers = function(req, res){
 }
 
 exports.GetSingleUser = function(req, res){
-    console.log(res.locals)
-    console.log(req.params)
-    res.send(200)
+    const jwtEmail = res.locals.result.email.email
+    const paramEmail = req.params.email
+    
+    if (jwtEmail === paramEmail){
+        res.send({
+            username : res.locals.result.email.username,
+            email : res.locals.result.email.email
+        })
+    } else {
+        res.send(401)
+    }
+
 }
 
 exports.VerifyEmail = function(req, res){
@@ -154,8 +164,6 @@ exports.VerifyEmail = function(req, res){
                             "token" : token
                         })
                     })
-
-                    res.status(200).send("EmailVerified")
                 })
             } else {
                 res.status(400).send("Error Occured 2")
@@ -178,5 +186,20 @@ exports.GetInContact = function(req, res) {
     helper.SendReceipt(context, recipient)
 
     res.send("email sent")
+
+}
+
+exports.FindWhoIAm = function(req, res) {
+    //check for email
+
+    DB.CheckForEmail(USERS_DB_TABLE, res.locals.result.email.email, (err, result) => {
+        if(err) { console.log(err); res.sendStatus(500); return; }
+        res.send({
+            id : result[0].id,
+            username : result[0].username,
+            email : result[0].email
+        })
+    })
+
 
 }

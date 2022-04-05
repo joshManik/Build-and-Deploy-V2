@@ -21,7 +21,7 @@ var storage = multer.diskStorage({
 var upload = multer({ storage: storage })
 
 const limiter = rateLimit({
-  windowMs: 30 * 1000, // 1 minute
+  windowMs: 1000, // 1 minute
   max: 100, // limit each IP to 50 requests per windowMs
   message: "Too many requests, please try again after 15 minutes"
 
@@ -75,7 +75,10 @@ app.delete('/blogs/:id', authHelper.AuthenticateAdminToken, blog.DeleteSpecific)
 
 app.get('/users/all', authHelper.AuthenticateAdminToken, auth.AllUsers)
 
-app.get('/users/user/:id', authHelper.AuthenticateToken, auth.GetSingleUser)
+app.get('/users/user/:email', authHelper.AuthenticateToken, auth.GetSingleUser)
+
+app.get('/users/get', authHelper.AuthenticateToken, auth.FindWhoIAm)
+
 
 // Auth Endpoints
 
@@ -84,8 +87,6 @@ app.post('/signup', auth.SignUp)
 app.post('/login', body(['email']).isEmail(), auth.Login)
 
 app.post('/refresh', authHelper.AuthenticateToken, authHelper.RefreshToken)
-
-app.get('/users/all', authHelper.AuthenticateAdminToken, auth.AllUsers)
 
 app.get('/auth', authHelper.AuthenticateToken, (req, res) => {res.sendStatus(200)})
 
