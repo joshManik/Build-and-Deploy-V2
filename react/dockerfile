@@ -1,6 +1,6 @@
 FROM nginx:stable-alpine
 
-COPY react/nginx/react.conf /etc/nginx/conf.d/default.conf
+COPY react/nginx/default.conf /etc/nginx/conf.d/default.conf
 
 COPY react/build /usr/share/nginx/html
 
