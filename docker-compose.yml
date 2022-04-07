@@ -37,6 +37,10 @@ services:
       context: .
       dockerfile: ./react/dockerfile
 
+    volumes:
+      - "/etc/letsencrypt:/etc/letsencrypt" 
+      - "/var/lib/letsencrypt:/var/lib/letsencrypt"
+
     depends_on:
       - db
       - api
