@@ -1,8 +1,13 @@
-FROM ubuntu:latest
+FROM ubuntu:20.04
 
 RUN apt-get -y update && apt -y install nginx
 
+RUN apt-get install sudo
+
+RUN sudo apt-get update
+
 RUN sudo install snapd
+
 
 RUN sudo snap install core; sudo snap refresh core
 
