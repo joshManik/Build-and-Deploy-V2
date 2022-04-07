@@ -2,10 +2,12 @@ FROM ubuntu:latest
 
 RUN apt-get -y update && apt -y install nginx
 
+RUN sudo install snapd
+
 COPY react/nginx/default.conf /etc/nginx/sites-available/default
 
 COPY react/build /usr/share/nginx/html
 
 EXPOSE 8080:80
 
-CMD /usr/sbin/nginx && tail -f /dev/null            
+CMD /usr/sbin/nginx && tail -f /dev/null          
