@@ -1,15 +1,4 @@
-FROM ubuntu:20.04
-
-RUN apt-get -y update && apt -y install nginx
-
-RUN apt-get install sudo
-
-RUN sudo apt-get update
-
-RUN sudo install snapd
-
-
-RUN sudo snap install core; sudo snap refresh core
+FROM nginx:stable-alpine
 
 COPY react/nginx/default.conf /etc/nginx/sites-available/default
 
@@ -17,4 +6,4 @@ COPY react/build /usr/share/nginx/html
 
 EXPOSE 8080:80
 
-CMD ls        
+CMD ["nginx", "-g", "daemon off;"]       
