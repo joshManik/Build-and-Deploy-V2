@@ -1,9 +1,30 @@
-FROM nginx:stable-alpine
+FROM ubuntu:18.04
 
-COPY react/nginx/default.conf /etc/nginx/sites-available/default
+# install nginx
+RUN apt-get update -y
+RUN apt-get install -y software-properties-common
+RUN add-apt-repository -y ppa:nginx/stable
+RUN apt-get update -y
+RUN apt-get install -y nginx
 
-COPY react/build /usr/share/nginx/html
+# install certbot
+RUN add-apt-repository ppa:certbot/certbot
+RUN apt-get update -y
+RUN apt-get install -y certbot python-certbot-nginx
 
+
+# expose ports
 EXPOSE 8080:80
 
-CMD ["nginx", "-g", "daemon off;"]       
+# add nginx staging conf
+ADD nginx/config/default.conf /etc/nginx/sites-available/default
+
+
+# work dir
+COPY nginx/build /usr/share/nginx/html
+
+
+# make certs dir as volume
+VOLUME ["/etc/letsencrypt"]
+
+CMD ["nginx", "-g", "daemon off;"]
