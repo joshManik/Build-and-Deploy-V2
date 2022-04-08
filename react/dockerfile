@@ -17,11 +17,11 @@ RUN apt-get install -y certbot python-certbot-nginx
 EXPOSE 8080:80
 
 # add nginx staging conf
-ADD nginx/config/default.conf /etc/nginx/sites-available/default
+ADD react/nginx/default.conf /etc/nginx/sites-available/default
 
 
 # work dir
-COPY nginx/build /usr/share/nginx/html
+COPY react/build /usr/share/nginx/html
 
 
 # make certs dir as volume
