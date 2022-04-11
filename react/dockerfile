@@ -19,6 +19,8 @@ EXPOSE 8080:80
 # add nginx staging conf
 ADD react/nginx/startup.conf /etc/nginx/sites-available/default
 
+RUN nginx -t
+
 # Get Certs
 RUN certbot certonly --webroot --webroot-path=/usr/share/nginx/html --email joshmanik1@gmail.com --agree-tos --no-eff-email --staging -d 36-boxes.com
 
