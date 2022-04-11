@@ -16,12 +16,18 @@ RUN apt-get install -y certbot python-certbot-nginx
 # expose ports
 EXPOSE 8080:80
 
-# add nginx staging conf
-ADD react/nginx/default.conf /etc/nginx/sites-available/default
-
-
 # work dir
 COPY react/build /usr/share/nginx/html
+
+# add nginx staging conf
+ADD react/nginx/startup.conf /etc/nginx/sites-available/default
+
+# Get Certs
+RUN certbot certonly --webroot --webroot-path=/usr/share/nginx/html --email joshmanik1@gmail.com --agree-tos --no-eff-email -d 36-boxes.com
+
+#
+ADD react/nginx/default.conf /etc/nginx/sites-available/default
+
 
 
 # make certs dir as volume
