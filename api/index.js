@@ -38,7 +38,7 @@ app.use(limiter);
 require('dotenv').config();
 
 
-app.get('/initialize', INIT.InitialQuery)
+app.get('api/initialize', INIT.InitialQuery)
 
 // Image upload endpoint
 
